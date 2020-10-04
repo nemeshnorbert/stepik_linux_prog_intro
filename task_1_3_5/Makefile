@@ -11,5 +11,6 @@ libShared: secret.h secret.c
 
 clean:
 	rm -rf libShared.so
+	rm -rf solution
 
 .PHONY: all clean
