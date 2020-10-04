@@ -6,10 +6,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define MAX_COMM_SIZE 256
 
 struct proc_stat {
     int pid;                                    // 1  %d   int
-    char comm[258];                             // 2  %s   char*
+    char comm[MAX_COMM_SIZE];                   // 2  %s   char*
     char state;                                 // 3  %c   char
     int ppid;                                   // 4  %d   int
     int pgrp;                                   // 5  %d   int
@@ -66,8 +67,17 @@ struct proc_stat {
 void read_proc_stat_impl(FILE* fid, struct proc_stat* stat) {
     assert(fid != NULL);
 
+    char parenthsis;
+
+    fscanf(fid, "%d", &(stat->pid));
+    fscanf(fid, " %c", &parenthsis);
+    assert(parenthsis == '(');
+    fscanf(fid, "%[^)]s", stat->comm);
+    fscanf(fid, "%c", &parenthsis);
+    assert(parenthsis == ')');
+
     const char fmt[] = (
-        "%d %s %c %d %d "
+        " %c %d %d "
         "%d %d %d %u %lu "
         "%lu %lu %lu %lu "
         "%lu %ld %ld %ld "
@@ -81,8 +91,6 @@ void read_proc_stat_impl(FILE* fid, struct proc_stat* stat) {
         "%lu %lu %lu %d");
 
     fscanf(fid, fmt,
-        &(stat->pid),
-        (stat->comm),
         &(stat->state),
         &(stat->ppid),
         &(stat->pgrp),
