@@ -43,6 +43,10 @@ int main(int argc, char* argv[]) {
     int port = (int)parse_port(argv[1]);
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock == -1) {
+        perror("Cannot create socket");
+        exit(EXIT_FAILURE);
+    }
 
     struct sockaddr_in local = {0};
     inet_aton("127.0.0.1", &local.sin_addr);
